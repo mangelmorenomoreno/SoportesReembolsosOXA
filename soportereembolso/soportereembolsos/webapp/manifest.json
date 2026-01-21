@@ -1,0 +1,136 @@
+{
+  "_version": "1.73.1",
+  "sap.app": {
+    "id": "co.com.conconcreto.soportereembolsos",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.20.1",
+      "toolsId": "eb94217b-bd48-4fcd-bd45-f9fe64182a39"
+    },
+    "dataSources": {
+      "S4_PROYECTO": {
+        "uri": "/sap/opu/odata/sap/YY1_AYUDABUSQPROYECTO_CDS/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "S4_GRUPO_CECO": {
+        "uri": "/sap/opu/odata/sap/YY1_GRUPOCENTROCOSTEOXA_CDS/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "restReemb": {
+        "uri": "/sap/bc/http/sap/zmm_sop_reemb_ivavis",
+        "type": "JSON"
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.136.2",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "co.com.conconcreto.soportereembolsos.i18n.i18n"
+        }
+      },
+      "S4OData": {
+        "dataSource": "S4_GRUPO_CECO",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Inline"
+        }
+      },
+      "S4ProyectoOData": {
+        "dataSource": "S4_PROYECTO",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Inline"
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "co.com.conconcreto.soportereembolsos.view",
+        "async": true,
+        "viewPath": "co.com.conconcreto.soportereembolsos.view"
+      },
+      "routes": [
+        {
+          "name": "RouteReembolsos",
+          "pattern": ":?query:",
+          "target": [
+            "TargetReembolsos"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetReembolsos": {
+          "id": "Reembolsos",
+          "name": "Reembolsos"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "co.com.conconcreto.soportereembolsos.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "soportereembolso"
+  }
+}

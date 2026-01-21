@@ -1,0 +1,93 @@
+_schema-version: "3.2"
+ID: soportereembolso
+version: 0.0.1
+modules:
+- name: soportereembolso-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: soportereembolso-destination-service
+    parameters:
+      content-target: true
+  - name: soportereembolso_html_repo_host
+    parameters:
+      service-key:
+        name: soportereembolso_html_repo_host-key
+  - name: uaa_soportereembolso
+    parameters:
+      service-key:
+        name: uaa_soportereembolso-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: soportereembolso_soportereembolso_html_repo_host
+          ServiceInstanceName: soportereembolso-html5-app-host-service
+          ServiceKeyName: soportereembolso_html_repo_host-key
+          sap.cloud.service: soportereembolso
+        - Authentication: OAuth2UserTokenExchange
+          Name: soportereembolso_uaa_soportereembolso
+          ServiceInstanceName: soportereembolso-xsuaa-service
+          ServiceKeyName: uaa_soportereembolso-key
+          sap.cloud.service: soportereembolso
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: soportereembolso-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: soportereembolso_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - cocomconconcretosoportereembolsos.zip
+      name: cocomconconcretosoportereembolsos
+      target-path: resources/
+- name: cocomconconcretosoportereembolsos
+  type: html5
+  path: soportereembolsos
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: soportereembolso-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: soportereembolso-destination-service
+    service-plan: lite
+- name: soportereembolso_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: soportereembolso-html5-app-host-service
+    service-plan: app-host
+- name: uaa_soportereembolso
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: soportereembolso-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
