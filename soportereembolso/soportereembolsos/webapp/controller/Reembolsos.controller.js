@@ -35,6 +35,7 @@ sap.ui.define([
                 ui: {
 
                     busy: false, sociedadSelected: false,
+                    isSociedad4813: false,
                     showProject: false,
                     showTipoDoc: false,
                     showCeco: false,
@@ -128,7 +129,7 @@ sap.ui.define([
             }
         },
 
-        
+
 
         onProyectoVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -264,6 +265,7 @@ sap.ui.define([
             const is4813 = (soc === "4813");
 
             oModel.setProperty("/ui/sociedadSelected", isSelected);
+            oModel.setProperty("/ui/isSociedad4813", is4813);
             oModel.setProperty("/ui/showFechas", isSelected);
 
             oModel.setProperty("/ui/showProject", isSelected && is4810_4811);
@@ -472,7 +474,7 @@ sap.ui.define([
             oBinding.filter([new Filter({ filters: aFilters, and: false })]);
         },
 
-        
+
 
         onTipoDocVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -562,7 +564,7 @@ sap.ui.define([
             oBinding.filter([new Filter({ filters: aFilters, and: false })]);
         },
 
-        
+
 
         onCecoVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -703,7 +705,7 @@ sap.ui.define([
             return out;
         },
 
-        
+
         // ======================================================
         // MULTI-VALUES (Input permite "A, B, C")
         // ======================================================
@@ -741,7 +743,7 @@ sap.ui.define([
             return Array.from(m.values());
         },
 
-// ======================================================
+        // ======================================================
         // EVENTS APP
         // ======================================================
         onSelectionChange: function () {
@@ -796,9 +798,6 @@ sap.ui.define([
             this._revokePdfUrl();
             this._applySociedadRules("");
         },
-
-        
-
         onBuscar: async function () {
             const oModel = this.getView().getModel();
             const f = oModel.getProperty("/filters");
@@ -806,6 +805,9 @@ sap.ui.define([
             const sSoc = (f.Sociedad || "").trim();
             const is4810_4811 = (sSoc === "4810" || sSoc === "4811");
             const is4813 = (sSoc === "4813");
+
+            oModel.setProperty("/ui/isSociedad4813", is4813);
+            oModel.setProperty("/ui/sociedadSelected", !!sSoc);
 
             if (!sSoc) return MessageBox.warning("Debe seleccionar Sociedad.");
             if (!f.FechaIni || !f.FechaFin) return MessageBox.warning("Debe diligenciar Fecha Ejecución (Inicio y Fin).");
@@ -1028,7 +1030,7 @@ sap.ui.define([
             }.bind(this));
         },
 
-        
+
 
         _loadDetalleFromSelectedItems: async function (aSelectedItems) {
             const oModel = this.getView().getModel();
