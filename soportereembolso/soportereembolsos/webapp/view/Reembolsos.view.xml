@@ -4,13 +4,15 @@
   xmlns="sap.m"
   xmlns:f="sap.f"
   xmlns:core="sap.ui.core"
+  xmlns:form="sap.ui.layout.form"
   xmlns:vm="sap.ui.comp.variants">
 
   <!--
-    Ajuste solicitado:
-    - Se elimina el botón "Cargar detalle"
-    - El PDF se genera directamente con los registros SELECCIONADOS en la tabla
-    - Se simplifica a una sola tabla (lista) para selección + generación PDF
+    Vista ajustada para parecerse a la estructura del ejemplo "Reembolso":
+    - DynamicPage con VariantManagement en el título
+    - Header con filtros en HBox/VBox (estilo barra de filtros simple)
+    - Acciones principales en un OverflowToolbar sobre la tabla (estilo List Report)
+    - Se conserva binding/handlers existentes (onBuscar/onCargarDetalle/onImprimirPdf/onLimpiar, valueHelp, etc.)
   -->
 
   <f:DynamicPage id="dpReembolsos" showFooter="false">
@@ -23,7 +25,7 @@
 
         <f:heading>
           <!-- Si tu controller NO tiene estos métodos (onVariantManagementSelect/Save/Manage),
-               quita los eventos o copia la implementación del controller ejemplo. -->
+               copia los del controller ejemplo o elimina los eventos. -->
           <vm:VariantManagement
             id="idVariantManagement"
             select=".onVariantManagementSelect"
@@ -88,7 +90,7 @@
               <Input
                 id="inpProyecto"
                 value="{/filters/Proyecto}"
-                placeholder="Seleccione uno o varios (separado por coma)"
+                placeholder="Seleccione proyecto..."
                 width="260px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpProyecto" />
@@ -100,7 +102,7 @@
               <Input
                 id="inpTipoDoc"
                 value="{/filters/tipodoc}"
-                placeholder="Seleccione uno o varios (ej: R, H)"
+                placeholder="Selecciona (R/H)"
                 width="200px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpTipoDoc" />
@@ -112,7 +114,7 @@
               <Input
                 id="inpGrupoCeco"
                 value="{/filters/Ceco}"
-                placeholder="Seleccione uno o varios (separado por coma)"
+                placeholder="Selecciona grupo CECO"
                 width="200px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpCeco" />
@@ -150,7 +152,7 @@
     </f:header>
 
     <!-- =========================
-         CONTENT (tabla + toolbar superior)
+         CONTENT (tablas + toolbar superior)
          ========================= -->
     <f:content>
       <VBox
@@ -159,7 +161,7 @@
         busy="{/ui/busy}"
         busyIndicatorDelay="0">
 
-        <!-- Toolbar principal -->
+        <!-- Toolbar principal estilo ejemplo -->
         <OverflowToolbar id="otAcciones">
           <Title
             id="ttlLista"
@@ -175,6 +177,7 @@
 
           <ToolbarSpacer id="_IDGenToolbarSpacer1" />
 
+          <!-- Acciones (se conservan handlers existentes) -->
           <Button
             id="btnBuscarTop"
             text="Buscar"
@@ -190,19 +193,34 @@
             text="{i18n>exportarExcel}"
             tooltip="{i18n>exportarExcel}"
             press="onExportarExcelButtonPress"
-            visible="{/ui/sociedadSelected}" 
-            enabled="{= ${/selectedCount} > 0 }"/>
+            visible="{/ui/sociedadSelected}" />
 
-          <!-- PDF: ahora depende de selección (NO de /detail) -->
           <Button
             id="btnPdfTop"
             icon="sap-icon://pdf-attachment"
             text="{i18n>exportarPdf}"
             tooltip="{i18n>exportarPdf}"
             press=".onImprimirPdf"
-            visible="{/ui/sociedadSelected}" 
             enabled="{= ${/selectedCount} > 0 }"
-             />
+            visible="{/ui/sociedadSelected}" />
+
+          <Button
+            id="btnSoporteIvaTop"
+            icon="sap-icon://pdf-attachment"
+            text="Soporte IVA"
+            tooltip="Descargar Soporte IVA VIS"
+            press=".onSoporteIvaPdf"
+            enabled="{= ${/selectedCount} > 0 }"
+            visible="{/ui/sociedadSelected}" />
+
+          <Button
+            id="btnSoporteOxaTop"
+            icon="sap-icon://pdf-attachment"
+            text="Soporte Oxa"
+            tooltip="Descargar Soporte OXA"
+            press=".onSoporteOxaPdf"
+            enabled="{= ${/selectedCount} > 0 }"
+            visible="{/ui/sociedadSelected}" />
 
           <Button
             id="btnLimpiarTop"
@@ -213,7 +231,7 @@
             visible="{/ui/sociedadSelected}" />
         </OverflowToolbar>
 
-        <!-- LISTA (selección + PDF desde selección) -->
+        <!-- LISTA (se mantiene sap.m.Table para NO romper handlers/selección existentes) -->
         <Table
           id="tblLista"
           mode="MultiSelect"
@@ -224,14 +242,6 @@
           visible="{/ui/sociedadSelected}"
           items="{/list}">
 
-          <headerToolbar>
-            <Toolbar id="_IDGenToolbar">
-              <Title id="_IDGenTitle" text="Listado" level="H3"/>
-              <ToolbarSpacer id="_IDGenToolbarSpacer2"/>
-              <Text id="_IDGenText" text="{= 'Total: ' + (${/list}.length || 0) + ' | Seleccionados: ' + (${/selectedCount} || 0) }"/>
-            </Toolbar>
-          </headerToolbar>
-
           <columns>
             <Column id="_IDGenColumn" width="10rem"><Text id="_IDGenText1" text="N° Reembolso" /></Column>
             <Column id="_IDGenColumn1" width="10rem"><Text id="_IDGenText2" text="Fecha" /></Column>
@@ -240,7 +250,7 @@
           </columns>
 
           <items>
-            <ColumnListItem id="_IDGenColumnListItem1" vAlign="Middle">
+            <ColumnListItem id="_IDGenColumnListItem" vAlign="Middle">
               <cells>
                 <ObjectIdentifier id="_IDGenObjectIdentifier" title="{numeroReembolso}" text="Reembolso" />
                 <Text id="_IDGenText5" text="{accountingdocumentcreationdate}" />
@@ -250,6 +260,8 @@
             </ColumnListItem>
           </items>
         </Table>
+
+        
 
       </VBox>
     </f:content>
