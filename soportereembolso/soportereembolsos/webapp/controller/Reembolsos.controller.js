@@ -10,10 +10,22 @@ sap.ui.define([
     "sap/m/ColumnListItem",
     "sap/m/Text",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "co/com/conconcreto/soportereembolsos/util/Util"
 ], function (
-    Controller, JSONModel, MessageToast, MessageBox, PDFViewer,
-    TableSelectDialog, Column, Label, ColumnListItem, Text, Filter, FilterOperator
+    Controller,
+    JSONModel,
+    MessageToast,
+    MessageBox,
+    PDFViewer,
+    TableSelectDialog,
+    Column,
+    Label,
+    ColumnListItem,
+    Text,
+    Filter,
+    FilterOperator,
+    Util
 ) {
     "use strict";
 
@@ -70,7 +82,53 @@ sap.ui.define([
             // estado inicial
             this._applySociedadRules("");
         },
+        onExportPdf: async function () {
+            const oViewModel = this.getView().getModel();
+            const aSelected = oViewModel.getProperty("/selectedRows") || [];
 
+            if (!aSelected.length) {
+                return MessageBox.warning("Seleccione al menos un reembolso.");
+            }
+
+            this._setBusy(true);
+
+            try {
+                for (const oRow of aSelected) {
+                    await this._exportOneReembolso(oRow);
+                }
+
+                MessageToast.show("PDF(s) generado(s) correctamente.");
+            } catch (e) {
+                MessageBox.error(this._normalizeError(e));
+            } finally {
+                this._setBusy(false);
+            }
+        },
+        _exportOneReembolso: async function (oRow) {
+            const oModel = this.getView().getModel();
+            const f = oModel.getProperty("/filters");
+
+            const oParams = {
+                Sociedad: f.Sociedad,
+                Proyecto: "",
+                FechaIni: "",
+                FechaFin: "",
+                Indicador: "3",
+                Ceco: "",
+                reembolso: oRow.numeroReembolso,
+                fecha: Util.formatFechaYYYYMMDD(oRow.accountingdocumentcreationdate),
+                tipodoc: ""
+            };
+
+            const vResp = await this._callService(oParams);
+
+            const aDetalle = Array.isArray(vResp) ? vResp : [vResp];
+
+            if (!aDetalle.length) {
+                throw new Error("No se encontró detalle para el reembolso " + oRow.numeroReembolso);
+            }
+           Util.generateFormatoFromEndpoint(aDetalle);
+        },
         // ======================================================
         // PROYECTO (4810/4811) DESDE ODATA + VALUE HELP
         // ======================================================

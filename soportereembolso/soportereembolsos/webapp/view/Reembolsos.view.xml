@@ -203,6 +203,11 @@
             visible="{/ui/sociedadSelected}" 
             enabled="{= ${/selectedCount} > 0 }"
              />
+            <Button
+            text="Reembolso Debito"
+            icon="sap-icon://pdf-attachment"
+            press=".onExportPdf"
+            enabled="{= ${/selectedCount} > 0 }" /> 
 
           <Button
             id="btnLimpiarTop"
