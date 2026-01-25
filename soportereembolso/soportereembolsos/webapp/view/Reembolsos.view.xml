@@ -201,13 +201,13 @@
             tooltip="{i18n>exportarPdf}"
             press=".onImprimirPdf"
             visible="{/ui/sociedadSelected}" 
-            enabled="{= ${/selectedCount} > 0 }"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
              />
             <Button
-            text="Reembolso Debito"
+            text="{i18n>reembolsoDebito}"
             icon="sap-icon://pdf-attachment"
             press=".onExportPdf"
-            enabled="{= ${/selectedCount} > 0 }" /> 
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; ${/ui/isSociedad4813} }" /> 
 
           <Button
             id="btnLimpiarTop"
