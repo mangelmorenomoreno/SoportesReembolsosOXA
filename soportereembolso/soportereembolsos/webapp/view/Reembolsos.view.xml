@@ -184,14 +184,7 @@
             enabled="{/ui/enableBuscar}"
             visible="{/ui/sociedadSelected}" />
 
-          <Button
-            id="btnExportExcelTop"
-            icon="sap-icon://excel-attachment"
-            text="{i18n>exportarExcel}"
-            tooltip="{i18n>exportarExcel}"
-            press="onExportarExcelButtonPress"
-            visible="{/ui/sociedadSelected}" 
-            enabled="{= ${/selectedCount} > 0 }"/>
+
 
           <!-- PDF: ahora depende de selección (NO de /detail) -->
           <Button
@@ -203,6 +196,23 @@
             visible="{/ui/sociedadSelected}" 
             enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
              />
+             <Button
+            id="btnSoporteIvaTop"
+            icon="sap-icon://pdf-attachment"
+            text="Soporte IVA"
+            tooltip="Descargar Soporte IVA VIS"
+            press=".onSoporteIvaPdf"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
+            visible="{/ui/sociedadSelected}" />
+ 
+          <Button
+            id="btnSoporteOxaTop"
+            icon="sap-icon://pdf-attachment"
+            text="Soporte Oxa"
+            tooltip="Descargar Soporte OXA"
+            press=".onSoporteOxaPdf"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
+            visible="{/ui/sociedadSelected}" />
             <Button
             text="{i18n>reembolsoDebito}"
             icon="sap-icon://pdf-attachment"
