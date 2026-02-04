@@ -10,10 +10,22 @@ sap.ui.define([
     "sap/m/ColumnListItem",
     "sap/m/Text",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "co/com/conconcreto/soportereembolsos/util/Util"
 ], function (
-    Controller, JSONModel, MessageToast, MessageBox, PDFViewer,
-    TableSelectDialog, Column, Label, ColumnListItem, Text, Filter, FilterOperator
+    Controller,
+    JSONModel,
+    MessageToast,
+    MessageBox,
+    PDFViewer,
+    TableSelectDialog,
+    Column,
+    Label,
+    ColumnListItem,
+    Text,
+    Filter,
+    FilterOperator,
+    Util
 ) {
     "use strict";
 
@@ -35,6 +47,7 @@ sap.ui.define([
                 ui: {
 
                     busy: false, sociedadSelected: false,
+                    isSociedad4813: false,
                     showProject: false,
                     showTipoDoc: false,
                     showCeco: false,
@@ -69,7 +82,53 @@ sap.ui.define([
             // estado inicial
             this._applySociedadRules("");
         },
+        onExportPdf: async function () {
+            const oViewModel = this.getView().getModel();
+            const aSelected = oViewModel.getProperty("/selectedRows") || [];
 
+            if (!aSelected.length) {
+                return MessageBox.warning("Seleccione al menos un reembolso.");
+            }
+
+            this._setBusy(true);
+
+            try {
+                for (const oRow of aSelected) {
+                    await this._exportOneReembolso(oRow);
+                }
+
+                MessageToast.show("PDF(s) generado(s) correctamente.");
+            } catch (e) {
+                MessageBox.error(this._normalizeError(e));
+            } finally {
+                this._setBusy(false);
+            }
+        },
+        _exportOneReembolso: async function (oRow) {
+            const oModel = this.getView().getModel();
+            const f = oModel.getProperty("/filters");
+
+            const oParams = {
+                Sociedad: f.Sociedad,
+                Proyecto: "",
+                FechaIni: "",
+                FechaFin: "",
+                Indicador: "3",
+                Ceco: "",
+                reembolso: oRow.numeroReembolso,
+                fecha: Util.formatFechaYYYYMMDD(oRow.accountingdocumentcreationdate),
+                tipodoc: ""
+            };
+
+            const vResp = await this._callService(oParams);
+
+            const aDetalle = Array.isArray(vResp) ? vResp : [vResp];
+
+            if (!aDetalle.length) {
+                throw new Error("No se encontró detalle para el reembolso " + oRow.numeroReembolso);
+            }
+           Util.generateFormatoFromEndpoint(aDetalle);
+        },
         // ======================================================
         // PROYECTO (4810/4811) DESDE ODATA + VALUE HELP
         // ======================================================
@@ -128,7 +187,7 @@ sap.ui.define([
             }
         },
 
-        
+
 
         onProyectoVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -264,6 +323,7 @@ sap.ui.define([
             const is4813 = (soc === "4813");
 
             oModel.setProperty("/ui/sociedadSelected", isSelected);
+            oModel.setProperty("/ui/isSociedad4813", is4813);
             oModel.setProperty("/ui/showFechas", isSelected);
 
             oModel.setProperty("/ui/showProject", isSelected && is4810_4811);
@@ -472,7 +532,7 @@ sap.ui.define([
             oBinding.filter([new Filter({ filters: aFilters, and: false })]);
         },
 
-        
+
 
         onTipoDocVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -562,7 +622,7 @@ sap.ui.define([
             oBinding.filter([new Filter({ filters: aFilters, and: false })]);
         },
 
-        
+
 
         onCecoVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
@@ -703,7 +763,7 @@ sap.ui.define([
             return out;
         },
 
-        
+
         // ======================================================
         // MULTI-VALUES (Input permite "A, B, C")
         // ======================================================
@@ -741,7 +801,7 @@ sap.ui.define([
             return Array.from(m.values());
         },
 
-// ======================================================
+        // ======================================================
         // EVENTS APP
         // ======================================================
         onSelectionChange: function () {
@@ -796,9 +856,6 @@ sap.ui.define([
             this._revokePdfUrl();
             this._applySociedadRules("");
         },
-
-        
-
         onBuscar: async function () {
             const oModel = this.getView().getModel();
             const f = oModel.getProperty("/filters");
@@ -806,6 +863,9 @@ sap.ui.define([
             const sSoc = (f.Sociedad || "").trim();
             const is4810_4811 = (sSoc === "4810" || sSoc === "4811");
             const is4813 = (sSoc === "4813");
+
+            oModel.setProperty("/ui/isSociedad4813", is4813);
+            oModel.setProperty("/ui/sociedadSelected", !!sSoc);
 
             if (!sSoc) return MessageBox.warning("Debe seleccionar Sociedad.");
             if (!f.FechaIni || !f.FechaFin) return MessageBox.warning("Debe diligenciar Fecha Ejecución (Inicio y Fin).");
@@ -1335,7 +1395,7 @@ _loadSoporteOxaFromSelectedItems: async function (aSelectedItems) {
 
 
 
-        
+
 
         _loadDetalleFromSelectedItems: async function (aSelectedItems) {
             const oModel = this.getView().getModel();

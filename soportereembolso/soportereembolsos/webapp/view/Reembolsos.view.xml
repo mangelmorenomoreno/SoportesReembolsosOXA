@@ -4,15 +4,13 @@
   xmlns="sap.m"
   xmlns:f="sap.f"
   xmlns:core="sap.ui.core"
-  xmlns:form="sap.ui.layout.form"
   xmlns:vm="sap.ui.comp.variants">
 
   <!--
-    Vista ajustada para parecerse a la estructura del ejemplo "Reembolso":
-    - DynamicPage con VariantManagement en el título
-    - Header con filtros en HBox/VBox (estilo barra de filtros simple)
-    - Acciones principales en un OverflowToolbar sobre la tabla (estilo List Report)
-    - Se conserva binding/handlers existentes (onBuscar/onCargarDetalle/onImprimirPdf/onLimpiar, valueHelp, etc.)
+    Ajuste solicitado:
+    - Se elimina el botón "Cargar detalle"
+    - El PDF se genera directamente con los registros SELECCIONADOS en la tabla
+    - Se simplifica a una sola tabla (lista) para selección + generación PDF
   -->
 
   <f:DynamicPage id="dpReembolsos" showFooter="false">
@@ -25,7 +23,7 @@
 
         <f:heading>
           <!-- Si tu controller NO tiene estos métodos (onVariantManagementSelect/Save/Manage),
-               copia los del controller ejemplo o elimina los eventos. -->
+               quita los eventos o copia la implementación del controller ejemplo. -->
           <vm:VariantManagement
             id="idVariantManagement"
             select=".onVariantManagementSelect"
@@ -90,7 +88,7 @@
               <Input
                 id="inpProyecto"
                 value="{/filters/Proyecto}"
-                placeholder="Seleccione proyecto..."
+                placeholder="Seleccione uno o varios (separado por coma)"
                 width="260px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpProyecto" />
@@ -102,7 +100,7 @@
               <Input
                 id="inpTipoDoc"
                 value="{/filters/tipodoc}"
-                placeholder="Selecciona (R/H)"
+                placeholder="Seleccione uno o varios (ej: R, H)"
                 width="200px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpTipoDoc" />
@@ -114,7 +112,7 @@
               <Input
                 id="inpGrupoCeco"
                 value="{/filters/Ceco}"
-                placeholder="Selecciona grupo CECO"
+                placeholder="Seleccione uno o varios (separado por coma)"
                 width="200px"
                 showValueHelp="true"
                 valueHelpRequest=".onValueHelpCeco" />
@@ -152,7 +150,7 @@
     </f:header>
 
     <!-- =========================
-         CONTENT (tablas + toolbar superior)
+         CONTENT (tabla + toolbar superior)
          ========================= -->
     <f:content>
       <VBox
@@ -161,7 +159,7 @@
         busy="{/ui/busy}"
         busyIndicatorDelay="0">
 
-        <!-- Toolbar principal estilo ejemplo -->
+        <!-- Toolbar principal -->
         <OverflowToolbar id="otAcciones">
           <Title
             id="ttlLista"
@@ -177,7 +175,6 @@
 
           <ToolbarSpacer id="_IDGenToolbarSpacer1" />
 
-          <!-- Acciones (se conservan handlers existentes) -->
           <Button
             id="btnBuscarTop"
             text="Buscar"
@@ -187,40 +184,40 @@
             enabled="{/ui/enableBuscar}"
             visible="{/ui/sociedadSelected}" />
 
-          <Button
-            id="btnExportExcelTop"
-            icon="sap-icon://excel-attachment"
-            text="{i18n>exportarExcel}"
-            tooltip="{i18n>exportarExcel}"
-            press="onExportarExcelButtonPress"
-            visible="{/ui/sociedadSelected}" />
 
+
+          <!-- PDF: ahora depende de selección (NO de /detail) -->
           <Button
             id="btnPdfTop"
             icon="sap-icon://pdf-attachment"
             text="{i18n>exportarPdf}"
             tooltip="{i18n>exportarPdf}"
             press=".onImprimirPdf"
-            enabled="{= ${/selectedCount} > 0 }"
-            visible="{/ui/sociedadSelected}" />
-
-          <Button
+            visible="{/ui/sociedadSelected}" 
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
+             />
+             <Button
             id="btnSoporteIvaTop"
             icon="sap-icon://pdf-attachment"
             text="Soporte IVA"
             tooltip="Descargar Soporte IVA VIS"
             press=".onSoporteIvaPdf"
-            enabled="{= ${/selectedCount} > 0 }"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
             visible="{/ui/sociedadSelected}" />
-
+ 
           <Button
             id="btnSoporteOxaTop"
             icon="sap-icon://pdf-attachment"
             text="Soporte Oxa"
             tooltip="Descargar Soporte OXA"
             press=".onSoporteOxaPdf"
-            enabled="{= ${/selectedCount} > 0 }"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
             visible="{/ui/sociedadSelected}" />
+            <Button
+            text="{i18n>reembolsoDebito}"
+            icon="sap-icon://pdf-attachment"
+            press=".onExportPdf"
+            enabled="{= ${/selectedCount} > 0 &amp;&amp; ${/ui/isSociedad4813} }" /> 
 
           <Button
             id="btnLimpiarTop"
@@ -231,7 +228,7 @@
             visible="{/ui/sociedadSelected}" />
         </OverflowToolbar>
 
-        <!-- LISTA (se mantiene sap.m.Table para NO romper handlers/selección existentes) -->
+        <!-- LISTA (selección + PDF desde selección) -->
         <Table
           id="tblLista"
           mode="MultiSelect"
@@ -242,17 +239,41 @@
           visible="{/ui/sociedadSelected}"
           items="{/list}">
 
+          <headerToolbar>
+            <Toolbar id="_IDGenToolbar">
+              <Title id="_IDGenTitle" text="Listado" level="H3"/>
+              <ToolbarSpacer id="_IDGenToolbarSpacer2"/>
+              <Text id="_IDGenText" text="{= 'Total: ' + (${/list}.length || 0) + ' | Seleccionados: ' + (${/selectedCount} || 0) }"/>
+            </Toolbar>
+          </headerToolbar>
+
           <columns>
+          <Column id="idSociedadColumn" width="8rem" visible="{/ui/isSociedad4813}" ><Text id="idSociedadText" text="{i18n>sociedad}" /></Column>
+          <Column id="idGrupoCeCoColumn" width="8rem"  visible="{/ui/isSociedad4813}"><Text id="idGrupoCeCoText" text="{i18n>grupoCeCo}" /></Column>
+          <Column id="idNombreGrupoCeCoColumn" width="8rem"  visible="{/ui/isSociedad4813}"><Text id="idNombreGrupoCeCoText" text="{i18n>nombreGrupoCeCo}" /></Column>
+         
+
             <Column id="_IDGenColumn" width="10rem"><Text id="_IDGenText1" text="N° Reembolso" /></Column>
+             <Column id="idCreadoPorColumn" width="8rem"  visible="{/ui/isSociedad4813}"><Text id="idCreadoPorText" text="{i18n>creadoPor}" /></Column>
+
             <Column id="_IDGenColumn1" width="10rem"><Text id="_IDGenText2" text="Fecha" /></Column>
             <Column id="_IDGenColumn2" width="8rem"><Text id="_IDGenText3" text="Hora" /></Column>
-            <Column id="_IDGenColumn3" minScreenWidth="Tablet" demandPopin="true"><Text id="_IDGenText4" text="Proyecto" /></Column>
+            <Column id="_IDGenColumn3" minScreenWidth="Tablet" demandPopin="true" visible="{/ui/showProject}"><Text id="_IDGenText4" text="Proyecto" /></Column>
           </columns>
 
           <items>
-            <ColumnListItem id="_IDGenColumnListItem" vAlign="Middle">
+            <ColumnListItem id="_IDGenColumnListItem1" vAlign="Middle">
               <cells>
+
+                <Text id="idCompanycodeText" text="{companycode}"/>
+                <Text id="idGrupocecoText" text="{grupoceco}"/>
+                <Text id="idNombreGrupocecoText" text="{nombreGrupoceco}"/>
+
+
                 <ObjectIdentifier id="_IDGenObjectIdentifier" title="{numeroReembolso}" text="Reembolso" />
+              
+                <Text id="idAccountingdoccreatedbyuserText" text="{accountingdoccreatedbyuser}" />
+                
                 <Text id="_IDGenText5" text="{accountingdocumentcreationdate}" />
                 <Text id="_IDGenText6" text="{creationtime}" />
                 <Text id="_IDGenText7" text="{projectdescription}" />
@@ -260,8 +281,6 @@
             </ColumnListItem>
           </items>
         </Table>
-
-        
 
       </VBox>
     </f:content>
