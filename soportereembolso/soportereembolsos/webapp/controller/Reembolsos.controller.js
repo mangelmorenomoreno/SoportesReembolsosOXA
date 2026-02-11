@@ -1946,11 +1946,14 @@ sap.ui.define([
                     canvas: [{ type: "line", x1: 0, y1: 0, x2: 220, y2: 0, lineWidth: 0.5 }],
                     margin: [0, 0, 0, 2]
                 });
+
+                var datosRevisor = (Array.isArray(aDetail) && aDetail.length) ? (aDetail[0] || {}) : {};
+
                 content.push({ text: " ", bold: true, fontSize: 8 });
                 content.push({ text: " ", bold: true, fontSize: 8 });
-                content.push({ text: oData.nombrerevisor || "", bold: true, fontSize: 8 });
-                content.push({ text: oData.descrevisor || "" , fontSize: 8 });
-                content.push({ text: oData.tarjetarevisor || "", fontSize: 8 });
+                content.push({ text: datosRevisor.nombrerevisor || "", bold: true, fontSize: 8 });
+                content.push({ text: datosRevisor.descrevisor || "" , fontSize: 8 });
+                content.push({ text: datosRevisor.tarjetarevisor || "", fontSize: 8 });
                 content.push({ text: "Ver certificación adjunta", italics: true, fontSize: 8 });
 
                 if (idx < docKeys.length - 1) {
