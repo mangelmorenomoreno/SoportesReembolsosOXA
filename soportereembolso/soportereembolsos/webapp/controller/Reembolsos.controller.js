@@ -1962,7 +1962,7 @@ sap.ui.define([
                 pageSize: "A4",
                 pageOrientation: "landscape",
                 pageMargins: [22, 28, 22, 28],
-                header: this._buildHeader("Soporte de Reembolso"),
+                //header: this._buildHeader("Soporte de Reembolso"),
                 footer: function (currentPage, pageCount) {
                     return {
                         text: "Página " + currentPage + " de " + pageCount,
