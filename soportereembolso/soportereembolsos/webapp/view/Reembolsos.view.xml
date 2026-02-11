@@ -205,7 +205,7 @@
             enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
             visible="{/ui/sociedadSelected}" />
  
-          <Button
+          <!-- <Button
             id="btnSoporteOxaTop"
             icon="sap-icon://pdf-attachment"
             text="Soporte Oxa"
@@ -213,6 +213,7 @@
             press=".onSoporteOxaPdf"
             enabled="{= ${/selectedCount} > 0 &amp;&amp; !${/ui/isSociedad4813} }"
             visible="{/ui/sociedadSelected}" />
+            -->
             <Button
             text="{i18n>reembolsoDebito}"
             icon="sap-icon://pdf-attachment"
