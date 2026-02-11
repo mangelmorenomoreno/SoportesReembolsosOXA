@@ -88,7 +88,8 @@ sap.ui.define([
                     margin: [25, 15, 25, 0], // izq, arriba, der, abajo
                     columns: [
                         { text: "", width: 40 }, // espacio opcional (si luego quieres logo)
-                        { text: sTitle, alignment: "center", bold: true, fontSize: 10, width: "*" },
+                        { text: sTitle, alignment: "center", bold: true, fontSize: 20, width: "*" },
+                        { text: "", width: 40 },
                         { text: "Página " + currentPage + " de " + pageCount, alignment: "right", fontSize: 9, width: 120 }
                     ]
                 };
@@ -1858,21 +1859,21 @@ sap.ui.define([
 
                 // Tabla detalle (equivalente autoTable)
                 const headerRow = [
-                    { text: "Clase\ndoc", style: "tableHeader" },
+                    { text: "Clase\nDocumento", style: "tableHeader" },
                     { text: "Documento", style: "tableHeader" },
                     { text: "Fecha", style: "tableHeader" },
-                    { text: "Ref.", style: "tableHeader" },
+                    { text: "Referencia", style: "tableHeader" },
                     { text: "NIT", style: "tableHeader" },
                     { text: "Nombre", style: "tableHeader" },
-                    { text: "Valor Total\ncosto", style: "tableHeader" },
-                    { text: "IVA Mayor\nvalor", style: "tableHeader" },
+                    { text: "Valor Total\nDel Costo", style: "tableHeader" },
+                    { text: "IVA Mayor\nvalor del costo", style: "tableHeader" },
                     //{ text: "IVA VIS", style: "tableHeader" },
-                    { text: "Factura\nReemb.", style: "tableHeader" },
-                    { text: "RteFte", style: "tableHeader" },
-                    { text: "Rte IVA", style: "tableHeader" },
-                    { text: "Rte ICA", style: "tableHeader" },
-                    { text: "Rte GAR", style: "tableHeader" },
-                    { text: "Neto\nRTE", style: "tableHeader" }
+                    { text: "Valor Facturado\na Reembolsar", style: "tableHeader" },
+                    { text: "Valor\nRte Fte", style: "tableHeader" },
+                    { text: "Valor\nRte IVA", style: "tableHeader" },
+                    { text: "Valor\nRte ICA", style: "tableHeader" },
+                    { text: "Valor\nRte GAR", style: "tableHeader" },
+                    { text: "Valor Neto-\nRTE", style: "tableHeader" }
                 ];
 
                 const bodyRows = (a || []).map((r) => ([
@@ -1947,7 +1948,7 @@ sap.ui.define([
                     margin: [0, 0, 0, 2]
                 });
 
-                var datosRevisor = (Array.isArray(aDetail) && aDetail.length) ? (aDetail[0] || {}) : {};
+                var datosRevisor = (Array.isArray(aAll) && aAll.length) ? (aAll[0] || {}) : {};
 
                 content.push({ text: " ", bold: true, fontSize: 8 });
                 content.push({ text: " ", bold: true, fontSize: 8 });
@@ -1964,8 +1965,8 @@ sap.ui.define([
             return {
                 pageSize: "A4",
                 pageOrientation: "landscape",
-                pageMargins: [22, 28, 22, 28],
-                //header: this._buildHeader("Soporte de Reembolso"),
+                pageMargins: [25, 70, 25, 40],
+                header: this._buildHeader("SOPORTE DE REEMBOLSO"),
                 footer: function (currentPage, pageCount) {
                     return {
                         text: "Página " + currentPage + " de " + pageCount,
