@@ -1562,7 +1562,7 @@ sap.ui.define([
                 const totalIva = (a || []).reduce((acc, it) => acc + Number(it?.ivaVis || 0), 0);
 
                 const totalRow = [
-                    { text: "Total", colSpan: 11, alignment: "right", bold: true }, "", "", "", "", "", "", "", "", "", "",
+                    { text: "Total:", colSpan: 11, alignment: "right", bold: true }, "", "", "", "", "", "", "", "", "", "",
                     { text: nf0.format(totalBase), alignment: "right", bold: true },
                     { text: nf0.format(totalIva), alignment: "right", bold: true }
                 ];
