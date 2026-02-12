@@ -1510,7 +1510,7 @@ sap.ui.define([
                 { text: "IVA VIS", style: "th" }
             ];
 
-            const widths = [40, 40, 45, 40, 40, 70, 80, 55, 55, 35, 45, 30, 75];
+            const widths = [40, 40, 45, 40, 40, 70, 65, 55, 55, 35, 45, 45, 75];
 
             const content = [];
 
