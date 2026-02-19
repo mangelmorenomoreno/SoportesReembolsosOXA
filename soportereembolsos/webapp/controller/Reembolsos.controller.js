@@ -187,42 +187,42 @@ sap.ui.define([
         },
 
         onProyectoVHSearch: async function (oEvent) {
-    const sValue = (oEvent.getParameter("value") || "").trim();
-    const oDialog = oEvent.getSource();
-    const oBinding = oDialog && oDialog.getBinding("items");
+            const sValue = (oEvent.getParameter("value") || "").trim();
+            const oDialog = oEvent.getSource();
+            const oBinding = oDialog && oDialog.getBinding("items");
 
-    // Carga una vez desde el servicio REST (Indicador=X). Luego filtra en cliente.
-    try {
-        if (!this.getView().getModel().getProperty("/ui/proyectosLoaded")) {
-            if (oDialog) oDialog.setBusy(true);
-            await this._loadProyectosFromOData(""); // (se dejó el nombre por compatibilidad)
-        }
-    } catch (e) {
-        // no bloquea la UI: si falla la consulta, igual permite cerrar el VH
-        MessageToast.show("No se pudo consultar proyectos.");
-    } finally {
-        if (oDialog) oDialog.setBusy(false);
-    }
+            // Carga una vez desde el servicio REST (Indicador=X). Luego filtra en cliente.
+            try {
+                if (!this.getView().getModel().getProperty("/ui/proyectosLoaded")) {
+                    if (oDialog) oDialog.setBusy(true);
+                    await this._loadProyectosFromOData(""); // (se dejó el nombre por compatibilidad)
+                }
+            } catch (e) {
+                // no bloquea la UI: si falla la consulta, igual permite cerrar el VH
+                MessageToast.show("No se pudo consultar proyectos.");
+            } finally {
+                if (oDialog) oDialog.setBusy(false);
+            }
 
-    if (!oBinding) return;
+            if (!oBinding) return;
 
-    if (!sValue) {
-        oBinding.filter([]);
-        return;
-    }
+            if (!sValue) {
+                oBinding.filter([]);
+                return;
+            }
 
-    oBinding.filter([new Filter({
-        filters: [
-            new Filter("Project", FilterOperator.Contains, sValue),
-            new Filter("ProjectDescription", FilterOperator.Contains, sValue)
-        ],
-        and: false
-    })]);
-},
+            oBinding.filter([new Filter({
+                filters: [
+                    new Filter("Project", FilterOperator.Contains, sValue),
+                    new Filter("ProjectDescription", FilterOperator.Contains, sValue)
+                ],
+                and: false
+            })]);
+        },
 
 
 
-onProyectoVHConfirm: function (oEvent) {
+        onProyectoVHConfirm: function (oEvent) {
             const aItems = oEvent.getParameter("selectedItems") || [];
             const oSingle = oEvent.getParameter("selectedItem");
 
@@ -262,58 +262,58 @@ onProyectoVHConfirm: function (oEvent) {
         },
 
         _loadProyectosFromOData: function (sSearch) {
-    const oModel = this.getView().getModel();
+            const oModel = this.getView().getModel();
 
-    const bLoaded = !!oModel.getProperty("/ui/proyectosLoaded");
-    const sVal = (sSearch || "").trim();
+            const bLoaded = !!oModel.getProperty("/ui/proyectosLoaded");
+            const sVal = (sSearch || "").trim();
 
-    // Si ya cargó la lista base, no vuelva a pedir (la búsqueda se hace client-side)
-    if (bLoaded && (oModel.getProperty("/proyectos") || []).length) {
-        return Promise.resolve();
-    }
+            // Si ya cargó la lista base, no vuelva a pedir (la búsqueda se hace client-side)
+            if (bLoaded && (oModel.getProperty("/proyectos") || []).length) {
+                return Promise.resolve();
+            }
 
-    const f = oModel.getProperty("/filters") || {};
-    const sSoc = String(f.Sociedad || "").trim();
+            const f = oModel.getProperty("/filters") || {};
+            const sSoc = String(f.Sociedad || "").trim();
 
-    if (!sSoc) {
-        return Promise.reject(new Error("Debe seleccionar una sociedad."));
-    }
+            if (!sSoc) {
+                return Promise.reject(new Error("Debe seleccionar una sociedad."));
+            }
 
-    // Servicio REST:
-    // /sap/bc/http/sap/zmm_sop_reemb_ivavis?Sociedad=....&Proyecto=&FechaIni=&FechaFin=&Indicador=X&Ceco=&reembolso=&fecha=&tipodoc=
-    const oParams = {
-        Sociedad: sSoc,
-        Proyecto: "",
-        FechaIni: "",
-        FechaFin: "",
-        Indicador: "X",
-        Ceco: "",
-        reembolso: "",
-        fecha: "",
-        tipodoc: ""
-    };
+            // Servicio REST:
+            // /sap/bc/http/sap/zmm_sop_reemb_ivavis?Sociedad=....&Proyecto=&FechaIni=&FechaFin=&Indicador=X&Ceco=&reembolso=&fecha=&tipodoc=
+            const oParams = {
+                Sociedad: sSoc,
+                Proyecto: "",
+                FechaIni: "",
+                FechaFin: "",
+                Indicador: "X",
+                Ceco: "",
+                reembolso: "",
+                fecha: "",
+                tipodoc: ""
+            };
 
-    return this._callService(oParams).then((vResp) => {
-        const aArr = Array.isArray(vResp) ? vResp : [];
+            return this._callService(oParams).then((vResp) => {
+                const aArr = Array.isArray(vResp) ? vResp : [];
 
-        // Normaliza estructura a {Project, ProjectDescription} para reutilizar el VH existente
-        const aRaw = aArr
-            .map((r) => ({
-                Project: String((r && r.proyecto) || "").trim(),
-                ProjectDescription: String((r && r.nombreProy) || "").trim()
-            }))
-            .filter((o) => !!o.Project);
+                // Normaliza estructura a {Project, ProjectDescription} para reutilizar el VH existente
+                const aRaw = aArr
+                    .map((r) => ({
+                        Project: String((r && r.proyecto) || "").trim(),
+                        ProjectDescription: String((r && r.nombreProy) || "").trim()
+                    }))
+                    .filter((o) => !!o.Project);
 
-        const aDedup = this._dedupProyectos(aRaw);
+                const aDedup = this._dedupProyectos(aRaw);
 
-        oModel.setProperty("/proyectos", aDedup);
-        oModel.setProperty("/ui/proyectosLoaded", true);
+                oModel.setProperty("/proyectos", aDedup);
+                oModel.setProperty("/ui/proyectosLoaded", true);
 
-        return;
-    });
-},
+                return;
+            });
+        },
 
-_dedupProyectos: function (aItems) {
+        _dedupProyectos: function (aItems) {
             const m = new Map();
 
             (aItems || []).forEach((o) => {
@@ -392,9 +392,9 @@ _dedupProyectos: function (aItems) {
 
             oModel.setProperty("/filters", f);
 
-// limpiar maestros dependientes de sociedad
-oModel.setProperty("/proyectos", []);
-oModel.setProperty("/ui/proyectosLoaded", false);
+            // limpiar maestros dependientes de sociedad
+            oModel.setProperty("/proyectos", []);
+            oModel.setProperty("/ui/proyectosLoaded", false);
 
             // limpiar resultados cuando cambia sociedad
             oModel.setProperty("/list", []);
@@ -1957,6 +1957,8 @@ oModel.setProperty("/ui/proyectosLoaded", false);
                     const bodyTipo = [buildHeaderRow()];
                     (aTipo || []).forEach((r) => bodyTipo.push(rowFor(r)));
 
+
+
                     content.push({
                         table: {
                             headerRows: 1,
@@ -1995,6 +1997,7 @@ oModel.setProperty("/ui/proyectosLoaded", false);
                         { text: nf0.format(subtotalNeto), bold: true, fontSize: 7, alignment: "right" }
                     ];
 
+
                     content.push({ text: " ", margin: [0, 4, 0, 2] });
 
                     content.push({
@@ -2013,6 +2016,50 @@ oModel.setProperty("/ui/proyectosLoaded", false);
                         }
                     });
                 });
+
+                // ======================================================
+                // ✅ TOTAL GENERAL (suma de todos los subtotales / todo el detalle del documento)
+                // ======================================================
+                const totalValTotal = this._sum(a, "valortotalcosto");
+                const totalIvaMayor = this._sum(a, "ivamayorvalorcosto");
+                const totalFact = this._sum(a, "valorfactareembolsar");
+                const totalRetFte = this._sum(a, "valorretefuente");
+                const totalRteIva = this._sum(a, "valorrteiva");
+                const totalRteIca = this._sum(a, "valorrteica");
+                const totalRteGar = this._sum(a, "valorrtegar");
+                const totalNeto = this._sum(a, "valornetorte");
+
+                const totalGeneralRow = [
+                    { text: "TOTAL GENERAL:", colSpan: 6, bold: true, fontSize: 9, alignment: "left" },
+                    "", "", "", "", "",
+                    { text: nf0.format(totalValTotal), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalIvaMayor), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalFact), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalRetFte), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalRteIva), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalRteIca), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalRteGar), bold: true, fontSize: 8, alignment: "right" },
+                    { text: nf0.format(totalNeto), bold: true, fontSize: 8, alignment: "right" }
+                ];
+
+                content.push({ text: " ", margin: [0, 2, 0, 2] });
+
+                content.push({
+                    table: {
+                        headerRows: 0,
+                        widths: widths,
+                        body: [totalGeneralRow]
+                    },
+                    margin: [0, 0, 0, 10],
+                    layout: {
+                        // mismo estilo del subtotal: solo líneas horizontales
+                        hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 0.9 : 0; },
+                        vLineWidth: function () { return 0; },
+                        paddingTop: function () { return 7; },
+                        paddingBottom: function () { return 7; }
+                    }
+                });
+
 
                 // Espacio antes del bloque de certificación/firma
                 content.push({ text: " ", margin: [0, 12, 0, 18] });
