@@ -2030,16 +2030,16 @@ sap.ui.define([
                 const totalNeto = this._sum(a, "valornetorte");
 
                 const totalGeneralRow = [
-                    { text: "TOTAL GENERAL:", colSpan: 6, bold: true, fontSize: 9, alignment: "left" },
+                    { text: "TOTAL GENERAL:", colSpan: 6, bold: true, fontSize: 8, alignment: "left" },
                     "", "", "", "", "",
-                    { text: nf0.format(totalValTotal), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalIvaMayor), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalFact), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalRetFte), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalRteIva), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalRteIca), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalRteGar), bold: true, fontSize: 8, alignment: "right" },
-                    { text: nf0.format(totalNeto), bold: true, fontSize: 8, alignment: "right" }
+                    { text: nf0.format(totalValTotal), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalIvaMayor), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalFact), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalRetFte), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalRteIva), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalRteIca), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalRteGar), bold: true, fontSize: 7, alignment: "right" },
+                    { text: nf0.format(totalNeto), bold: true, fontSize: 7, alignment: "right" }
                 ];
 
                 content.push({ text: " ", margin: [0, 2, 0, 2] });
