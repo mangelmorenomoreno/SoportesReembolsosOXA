@@ -84,7 +84,7 @@
 
             <!-- PROYECTO -->
             <VBox id="vbProyecto" class="sapUiTinyMarginEnd" visible="{/ui/showProject}">
-              <Label id="lblProyecto" text="Definición del Proyecto" required="true" labelFor="inpProyecto" />
+              <Label id="lblProyecto" text="Definición del Proyecto" required="false" labelFor="inpProyecto" />
               <Input
                 id="inpProyecto"
                 value="{/filters/Proyecto}"

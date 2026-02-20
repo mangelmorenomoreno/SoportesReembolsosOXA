@@ -912,14 +912,17 @@ sap.ui.define([
             if (!f.FechaIni || !f.FechaFin) return MessageBox.warning("Debe diligenciar Fecha Ejecución (Inicio y Fin).");
 
             // ✅ Multi-valores permitidos en: Proyecto / TipoDoc / Ceco
-            const aProyectos = is4810_4811 ? this._parseMultiValues(f.Proyecto) : [];
+            const aProyectosRaw = is4810_4811 ? this._parseMultiValues(f.Proyecto) : [];
+            const aProyectos = aProyectosRaw.length ? aProyectosRaw : [""];
             const aTipoDocsRaw = is4810_4811 ? this._parseMultiValues(f.tipodoc) : [];
             const aTipoDocs = aTipoDocsRaw.length ? aTipoDocsRaw : [""]; // TipoDoc es opcional
             const aCecos = is4813 ? this._parseMultiValues(f.Ceco) : [];
 
-            if (is4810_4811) {
-                if (!aProyectos.length) return MessageBox.warning("Para 4810/4811 debe diligenciar Definición del Proyecto (uno o varios).");
-            } else if (is4813) {
+             if (is4810_4811) {
+                 //if (!aProyectos.length) return MessageBox.warning("Para 4810/4811 debe diligenciar Definición del Proyecto (uno o varios).");
+             } else 
+            
+            if (is4813) {
                 if (!aCecos.length) return MessageBox.warning("Para 4813 debe diligenciar Grupo CECO (uno o varios).");
             } else {
                 return MessageBox.warning("La sociedad seleccionada no tiene reglas configuradas en la app.");
@@ -1836,6 +1839,8 @@ sap.ui.define([
             // anchos aproximados (basados en el autoTable previo)
             const widths = [35, 45, 45, 45, 45, 75, 45, 45, 45, 40, 40, 40, 40, 45]; // ✅ 14 columnas (sin IVA VIS)
 
+            const widths2 = [35, 45, 45, 45, 45, 80, 50, 45, 45, 41, 41, 42, 40, 45]; // ✅ 14 columnas (sin IVA VIS)
+
             const content = [];
 
             docKeys.forEach((docKey, idx) => {
@@ -2003,7 +2008,7 @@ sap.ui.define([
                     content.push({
                         table: {
                             headerRows: 0,
-                            widths: widths,
+                            widths: widths2,
                             body: [subtotalRow]
                         },
                         margin: [0, 0, 0, 10],
@@ -2047,7 +2052,7 @@ sap.ui.define([
                 content.push({
                     table: {
                         headerRows: 0,
-                        widths: widths,
+                        widths: widths2,
                         body: [totalGeneralRow]
                     },
                     margin: [0, 0, 0, 10],
