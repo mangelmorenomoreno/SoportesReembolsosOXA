@@ -108,7 +108,7 @@
 
             <!-- CECO -->
             <VBox id="vbCeco" class="sapUiTinyMarginEnd" visible="{/ui/showCeco}">
-              <Label id="lblCeco" text="Grupo CECO" required="{/ui/showCeco}" labelFor="inpGrupoCeco" />
+              <Label id="lblCeco" text="Grupo CECO"  labelFor="inpGrupoCeco" />
               <Input
                 id="inpGrupoCeco"
                 value="{/filters/Ceco}"
@@ -215,10 +215,13 @@
             visible="{/ui/sociedadSelected}" />
             -->
             <Button
-            text="{i18n>reembolsoDebito}"
+            text="{i18n>reembolsoD/C}"
             icon="sap-icon://pdf-attachment"
             press=".onExportPdf"
-            enabled="{= ${/selectedCount} > 0 &amp;&amp; ${/ui/isSociedad4813} }" /> 
+            visible="{/ui/sociedadSelected}"
+            enabled="{= ${/selectedCount} > 0}"
+            tooltip="{i18n>reembolsoD/CTooltip}"
+            /> 
 
           <Button
             id="btnLimpiarTop"

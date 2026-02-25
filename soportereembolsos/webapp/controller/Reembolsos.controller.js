@@ -140,6 +140,9 @@ sap.ui.define([
             if (!aDetalle.length) {
                 throw new Error("No se encontró detalle para el reembolso " + oRow.numeroReembolso);
             }
+            aDetalle.forEach(d => {
+                d.sociedad = f.Sociedad;
+            });
             Util.generateFormatoFromEndpoint(aDetalle);
         },
         // ======================================================
@@ -916,17 +919,8 @@ sap.ui.define([
             const aProyectos = aProyectosRaw.length ? aProyectosRaw : [""];
             const aTipoDocsRaw = is4810_4811 ? this._parseMultiValues(f.tipodoc) : [];
             const aTipoDocs = aTipoDocsRaw.length ? aTipoDocsRaw : [""]; // TipoDoc es opcional
-            const aCecos = is4813 ? this._parseMultiValues(f.Ceco) : [];
-
-             if (is4810_4811) {
-                 //if (!aProyectos.length) return MessageBox.warning("Para 4810/4811 debe diligenciar Definición del Proyecto (uno o varios).");
-             } else 
-            
-            if (is4813) {
-                if (!aCecos.length) return MessageBox.warning("Para 4813 debe diligenciar Grupo CECO (uno o varios).");
-            } else {
-                return MessageBox.warning("La sociedad seleccionada no tiene reglas configuradas en la app.");
-            }
+            const aCecosRaw = is4813 ? this._parseMultiValues(f.Ceco) : [];
+            const aCecos = aCecosRaw.length ? aCecosRaw : [""];
 
             // Construye requests (OR por cada valor seleccionado)
             const aReqs = [];
