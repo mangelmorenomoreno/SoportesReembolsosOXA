@@ -1851,7 +1851,7 @@ sap.ui.define([
                 const descProyecto = h.descripcionproyecto || "";
                 const direccion = h.calle || "";
 
-                const totalSoporte = this._sum(a, "valortotalcosto");
+                const totalSoporte = this._sum(a, "valorfactareembolsar");
 
                 /*content.push({
                     text: "Soporte de Reembolso",
@@ -1891,7 +1891,7 @@ sap.ui.define([
                     { text: "Referencia", style: "tableHeader" },
                     { text: "NIT", style: "tableHeader" },
                     { text: "Nombre", style: "tableHeader" },
-                    { text: "Valor Total\nDel Costo", style: "tableHeader" },
+                    { text: "Valor Bruto", style: "tableHeader" },
                     { text: "IVA Mayor\nvalor del costo", style: "tableHeader" },
                     //{ text: "IVA VIS", style: "tableHeader" },
                     { text: "Valor Facturado\na Reembolsar", style: "tableHeader" },
